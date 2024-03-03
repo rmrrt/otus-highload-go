@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+  app:
+    build: 
+      context: ./app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app:/app
+      - go_build:/go/pkg/mod/cache
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=youruser
+      - DB_NAME=yourdb
+      - DB_PASSWORD=yourpassword
+    restart: on-failure
+
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_DB: yourdb
+      POSTGRES_PASSWORD: yourpassword
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+  go_build:
