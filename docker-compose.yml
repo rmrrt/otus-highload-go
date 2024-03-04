@@ -12,10 +12,11 @@ services:
     depends_on:
       - db
     environment:
-      - DB_HOST=db
-      - DB_USER=youruser
-      - DB_NAME=yourdb
-      - DB_PASSWORD=yourpassword
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}/${POSTGRES_DB}
     restart: on-failure
 
   db:
@@ -23,9 +24,10 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: youruser
-      POSTGRES_DB: yourdb
-      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
 

@@ -1,12 +1,14 @@
 package main
 
 import (
-	"database/sql"
+	"context"
+	"fmt"
+	"github.com/jackc/pgx/v5"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
 )
 
 type User struct {
@@ -20,16 +22,17 @@ type User struct {
 }
 
 func main() {
-	db, err := sql.Open("postgres", "host=localhost port=5432 user=youruser dbname=yourdb password=yourpassword sslmode=disable")
+	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
 	}
-	defer db.Close()
+	defer conn.Close(context.Background())
 
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "Something"})
+		c.JSON(http.StatusOK, gin.H{"status": "OK"})
 	})
 
 	r.POST("/user/register", func(c *gin.Context) {
@@ -45,5 +48,8 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"status": "OKAY"})
 	})
 
-	r.Run()
+	err = r.Run()
+	if err != nil {
+		return
+	}
 }
